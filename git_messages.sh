@@ -1,3 +1,7 @@
+# Fetch messages for one week from the date entered
+
+# Usage: source git_messages.sh <start-date>
+
 DATE=$1
 
 for i in {0..6}
