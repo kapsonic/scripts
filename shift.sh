@@ -33,7 +33,8 @@ time=`expr $NHRS - $a`
 
 outTime=$(date +%H:%M:%S --date "+$time seconds")
 inTime=$(date +%H:%M:%S --date "-$upTimeSec seconds")
-
-echo "In Time for $(date +%d-%m-%Y): $inTime"
-echo "Out Time for $(date +%d-%m-%Y): $outTime"
-echo "Time left for $(date +%d-%m-%Y): $(show_time $time)"
+echo "$(date +%d-%m-%Y)"
+echo "============================"
+echo "IN TIME: $inTime"
+echo "OUT TIME: $outTime"
+echo "TIME LEFT: $(show_time $time)"
