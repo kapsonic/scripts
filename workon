@@ -1,3 +1,0 @@
-#!/usr/bin/zsh
-echo $1
-cd "$HOME/Projects/Damco/$1"
