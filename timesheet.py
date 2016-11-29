@@ -9,7 +9,7 @@ help_text = 'Timesheet manager'
 sign_off = 'Author: Kapil Soni(kapils2@damcogroup.com)'
 parser = argparse.ArgumentParser(description=help_text, epilog=sign_off)
 
-
+#create table timesheet_table(project varchar(256), work_date DATE, description TEXT, hours INT, is_holiday INT, is_leave INT)
 parser.add_argument(
  	'--select',
 	dest='select',
