@@ -18,6 +18,18 @@ parser.add_argument(
 )
 
 parser.add_argument(
+ 	'--init',
+	dest='init',
+	action='count',
+	help='Initialize db file'
+)
+parser.add_argument(
+ 	'--merge',
+	dest='merge',
+	action='count',
+	help='Compress table by merging rows with same project and date'
+)
+parser.add_argument(
  	'--table',
 	dest='table',
 	action='count',
@@ -84,8 +96,9 @@ parser.add_argument(
 parser.add_argument(
  	'-d',
 	dest='description',
-	action='count',
+	action='store',
 	help='Description of work done',
+	metavar='description'
 )
 
 parser.add_argument(
@@ -116,7 +129,7 @@ def insertRecord(project, date, desc, hours, is_holiday=0, is_leave=0):
 	global connection
 	h = is_holiday if is_holiday is not None else 0
 	l = is_leave if is_leave is not None else 0
-	connection.execute('INSERT INTO timesheet_table VALUES(\'%s\', \'%s\', \'%s\', \'%d\', \'%d\', \'%d\')'%(project, date, desc, hours, h,l))
+	connection.execute('INSERT INTO timesheet_table VALUES(\'%s\', \'%s\', \'%s\', \'%d\', \'%d\', \'%d\')'%(project.lower(), date, desc, hours, h,l))
 	connection.commit()
 def selectRecord(project=None, startDate=None, endDate=None):
 	global connection
@@ -138,7 +151,25 @@ def selectRecord(project=None, startDate=None, endDate=None):
 	cursor = connection.execute(query)
 	return cursor
 	
-if(arguments.select != None):
+def merge():
+	records = connection.execute('select distinct project, work_date, count(*) from timesheet_table group by project, work_date')
+	for row in records:
+		if(int(row[2]) > 1):
+			cursor = connection.execute("SELECT description, hours FROM timesheet_table WHERE project = '%s' and work_date = '%s'"%(row[0], row[1]))
+			desc = ''
+			hours = 0
+			for r in cursor:
+				desc += r[0]
+				hours += int(r[1])
+			connection.execute("DELETE FROM timesheet_table WHERE project = '%s' and work_date = '%s'"%(row[0], row[1]))
+			insertRecord(row[0], row[1], desc, hours, 0, 0)
+
+
+if(arguments.merge != None):
+	merge()
+elif(arguments.init != None):
+	connection.execute('create table timesheet_table(project varchar(256), work_date DATE, description TEXT, hours INT, is_holiday INT, is_leave INT)')
+elif(arguments.select != None):
 	if(arguments.table != None):
 		from prettytable import PrettyTable
 		table = PrettyTable(['Project', 'Date', 'Description', 'Hours', 'Holiday?', 'Leave?'])
